@@ -1,4 +1,6 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -39,6 +41,7 @@ export function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
+  const { t } = useTranslation();
 
   const initials = (user?.user_metadata?.full_name || user?.email || "U")
     .split(" ")
@@ -78,7 +81,7 @@ export function AppLayout() {
               }
             >
               <Icon className="w-4 h-4" />
-              {label}
+              {t(label)}
             </NavLink>
           ))}
         </nav>
@@ -121,6 +124,8 @@ export function AppLayout() {
           <div className="hidden lg:block flex-1" />
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
+            
             <Button variant="ghost" size="icon" className="relative rounded-xl">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full" />
@@ -142,7 +147,7 @@ export function AppLayout() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
-                  <Settings className="w-4 h-4 mr-2" /> Settings
+                  <Settings className="w-4 h-4 mr-2" /> {t("Settings")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -151,7 +156,7 @@ export function AppLayout() {
                     navigate("/auth");
                   }}
                 >
-                  <LogOut className="w-4 h-4 mr-2" /> Sign out
+                  <LogOut className="w-4 h-4 mr-2" /> {t("Log Out")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -172,7 +177,7 @@ export function AppLayout() {
               }
             >
               <Icon className="w-5 h-5" />
-              <span className="truncate w-full text-center px-0.5">{label}</span>
+              <span className="truncate w-full text-center px-0.5">{t(label)}</span>
             </NavLink>
           ))}
         </nav>

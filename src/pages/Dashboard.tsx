@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Wallet, TrendingDown, PiggyBank, Percent, ArrowUpRight, ArrowDownRight, Sparkles, Target as TargetIcon, Zap, Wifi, Droplet, Briefcase } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import mascot from "@/assets/mascot.png";
+import { useTranslation } from "react-i18next";
 import { CSVImporter } from "@/components/CSVImporter";
 import { AIInsightsPanel } from "@/components/AIInsightsPanel";
 import { GoalQuickCreate } from "@/components/GoalQuickCreate";
@@ -17,6 +18,7 @@ const CAT_COLORS = ["hsl(var(--cat-food))", "hsl(var(--cat-shopping))", "hsl(var
 const ICON_MAP: Record<string, any> = { zap: Zap, wifi: Wifi, droplet: Droplet, briefcase: Briefcase };
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user, preferredCurrency } = useAuth();
   const { data: txns = [] } = useTransactions();
   const { data: goals = [] } = useGoals();
@@ -80,10 +82,10 @@ export default function Dashboard() {
   }, [txns]);
 
   const metrics = [
-    { label: "Total Income", value: stats.income, icon: Wallet, change: stats.incomeChange, positive: true, color: "category-food" },
-    { label: "Total Spent", value: stats.expense, icon: TrendingDown, change: stats.expenseChange, positive: false, color: "category-other" },
-    { label: "Saved", value: stats.saved, icon: PiggyBank, change: stats.savedChange, positive: true, color: "category-transport" },
-    { label: "Saving Rate", value: stats.savingRate, icon: Percent, change: stats.rateChange, positive: true, color: "category-entertainment", isPercent: true },
+    { label: t("Total Income", "Total Income"), value: stats.income, icon: Wallet, change: stats.incomeChange, positive: true, color: "category-food" },
+    { label: t("Total Spent", "Total Spent"), value: stats.expense, icon: TrendingDown, change: stats.expenseChange, positive: false, color: "category-other" },
+    { label: t("Saved", "Saved"), value: stats.saved, icon: PiggyBank, change: stats.savedChange, positive: true, color: "category-transport" },
+    { label: t("Saving Rate", "Saving Rate"), value: stats.savingRate, icon: Percent, change: stats.rateChange, positive: true, color: "category-entertainment", isPercent: true },
   ];
 
   const hasData = txns.length > 0;
@@ -133,8 +135,8 @@ export default function Dashboard() {
         {/* Donut */}
         <Card className="p-5 lg:p-6 rounded-2xl shadow-card border-border/50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display font-bold text-lg">Expense Breakdown</h3>
-            <span className="text-xs px-3 py-1 rounded-lg bg-muted text-muted-foreground">This Month</span>
+            <h3 className="font-display font-bold text-lg">{t("Expense Breakdown", "Expense Breakdown")}</h3>
+            <span className="text-xs px-3 py-1 rounded-lg bg-muted text-muted-foreground">{t("This Month", "This Month")}</span>
           </div>
           {stats.catData.length === 0 ? (
             <EmptyChart label="Add expenses to see your breakdown" />
@@ -175,8 +177,8 @@ export default function Dashboard() {
         {/* Trend */}
         <Card className="p-5 lg:p-6 rounded-2xl shadow-card border-border/50">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display font-bold text-lg">Spending Trend</h3>
-            <span className="text-xs px-3 py-1 rounded-lg bg-muted text-muted-foreground">Last 6 Months</span>
+            <h3 className="font-display font-bold text-lg">{t("Spending Trend", "Spending Trend")}</h3>
+            <span className="text-xs px-3 py-1 rounded-lg bg-muted text-muted-foreground">{t("Last 6 Months", "Last 6 Months")}</span>
           </div>
           {stats.trendData.every(d => d.value === 0) ? (
             <EmptyChart label="Track expenses over time" />
@@ -221,8 +223,8 @@ export default function Dashboard() {
 
           <Card className="p-5 rounded-2xl shadow-card border-border/50">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-bold">Upcoming Transactions</h3>
-              <Link to="/transactions" className="text-xs text-primary font-medium hover:underline">View All</Link>
+              <h3 className="font-display font-bold">{t("Upcoming Bills", "Upcoming Transactions")}</h3>
+              <Link to="/transactions" className="text-xs text-primary font-medium hover:underline">{t("View All", "View All")}</Link>
             </div>
             {upcoming.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">No upcoming bills. You're all caught up! ✨</p>

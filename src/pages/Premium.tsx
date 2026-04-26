@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Crown, Sparkles, Video, Brain, Zap, CheckCircle2 } from "lucide-react";
@@ -6,14 +7,15 @@ import { toast } from "sonner";
 import confetti from "canvas-confetti";
 
 export default function Premium() {
+  const { t } = useTranslation();
   const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
   const [loading, setLoading] = useState(false);
 
   const features = [
-    { icon: Brain, text: "Deep Financial Calculation & AI Analytics" },
-    { icon: Video, text: "Exclusive Video Tutorials & Guides" },
-    { icon: Zap, text: "Unlimited Goals & Transactions" },
-    { icon: Sparkles, text: "Early Access to New Features" },
+    { icon: Brain, text: t("Deep Financial Calculation & AI Analytics", "Deep Financial Calculation & AI Analytics") },
+    { icon: Video, text: t("Exclusive Video Tutorials & Guides", "Exclusive Video Tutorials & Guides") },
+    { icon: Zap, text: t("Unlimited Goals & Transactions", "Unlimited Goals & Transactions") },
+    { icon: Sparkles, text: t("Early Access to New Features", "Early Access to New Features") },
   ];
 
   const handleSubscribe = () => {
@@ -36,10 +38,10 @@ export default function Premium() {
           <Crown className="w-8 h-8 text-amber-500" />
         </div>
         <h1 className="text-3xl lg:text-5xl font-display font-bold">
-          Upgrade to <span className="text-amber-500">Premium</span>
+          {t("Upgrade to", "Upgrade to")} <span className="text-amber-500">{t("Premium", "Premium")}</span>
         </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          Take full control of your finances with advanced AI calculations, exclusive educational video content, and unlimited tracking.
+          {t("Take full control", "Take full control of your finances with advanced AI calculations, exclusive educational video content, and unlimited tracking.")}
         </p>
       </div>
 
@@ -49,13 +51,13 @@ export default function Premium() {
             onClick={() => setBilling("monthly")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${billing === "monthly" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
-            Monthly
+            {t("Monthly", "Monthly")}
           </button>
           <button 
             onClick={() => setBilling("yearly")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${billing === "yearly" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
           >
-            Yearly <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full ml-1">-20%</span>
+            {t("Yearly", "Yearly")} <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full ml-1">-20%</span>
           </button>
         </div>
       </div>
@@ -63,7 +65,7 @@ export default function Premium() {
       <div className="grid md:grid-cols-2 gap-8 mt-12 items-center">
         {/* Features */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold font-display">What's included?</h2>
+          <h2 className="text-2xl font-bold font-display">{t("What's included?", "What's included?")}</h2>
           <div className="space-y-4">
             {features.map((f, i) => {
               const Icon = f.icon;
@@ -104,7 +106,7 @@ export default function Premium() {
                 disabled={loading}
                 className="w-full py-6 text-lg rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-glow border-0"
               >
-                {loading ? "Processing..." : "Subscribe Now"}
+                {loading ? t("Processing...", "Processing...") : t("Subscribe Now", "Subscribe Now")}
               </Button>
               <div className="text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
