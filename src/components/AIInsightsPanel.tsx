@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Sparkles, AlertTriangle, Lightbulb, TrendingUp, Target, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTransactions } from "@/hooks/useFinanceData";
 
@@ -25,11 +24,17 @@ export function AIInsightsPanel() {
     if (txns.length === 0) return;
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("ai-insights", {
-        body: { transactions: txns, currency: preferredCurrency },
-      });
-      if (error) throw error;
-      if (data?.insights) setInsights(data.insights);
+      // Mocked AI insights
+      await new Promise(r => setTimeout(r, 1000));
+      const income = txns.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0);
+      const expense = txns.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0);
+      
+      const mockInsights = [
+        { type: "achievement", title: "Great tracking!", description: `You have logged ${txns.length} transactions so far.` },
+        { type: "suggestion", title: "Savings tip", description: `You spent ${expense} and earned ${income}. Consider saving a portion of your income!` },
+      ];
+      
+      setInsights(mockInsights);
     } catch (e) {
       console.error(e);
     } finally {

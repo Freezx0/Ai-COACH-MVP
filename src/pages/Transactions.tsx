@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Trash2, Search, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { CURRENCIES } from "@/lib/currency";
 import { formatMoney } from "@/lib/currency";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -33,9 +32,12 @@ export default function Transactions() {
   }, [txns, search, filter]);
 
   async function remove(id: string) {
-    const { error } = await supabase.from("transactions").delete().eq("id", id);
-    if (error) toast.error(error.message);
-    else { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["transactions"] }); }
+    const existingStr = localStorage.getItem("transactions");
+    let existing = existingStr ? JSON.parse(existingStr) : [];
+    existing = existing.filter((t: any) => t.id !== id);
+    localStorage.setItem("transactions", JSON.stringify(existing));
+    toast.success("Deleted"); 
+    qc.invalidateQueries({ queryKey: ["transactions"] });
   }
 
   return (
@@ -120,13 +122,25 @@ function TransactionForm({ onDone, defaultCurrency }: { onDone: () => void; defa
     e.preventDefault();
     if (!user) return;
     setBusy(true);
-    const { error } = await supabase.from("transactions").insert({
-      user_id: user.id, amount: Number(amount), type, category, description, currency,
+    
+    const newTxn = {
+      id: Math.random().toString(36).slice(2),
+      user_id: user.id, 
+      amount: Number(amount), 
+      type, 
+      category, 
+      description, 
+      currency,
       occurred_at: new Date(date).toISOString(),
-    });
+    };
+    
+    const existingStr = localStorage.getItem("transactions");
+    const existing = existingStr ? JSON.parse(existingStr) : [];
+    localStorage.setItem("transactions", JSON.stringify([...existing, newTxn]));
+    
     setBusy(false);
-    if (error) toast.error(error.message);
-    else { toast.success("Added!"); onDone(); }
+    toast.success("Added!"); 
+    onDone();
   }
 
   return (

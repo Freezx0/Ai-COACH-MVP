@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, FileText, Shield, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +20,7 @@ export function CSVImporter() {
       const rows = parseCSV(text);
       if (rows.length === 0) throw new Error("No rows detected in CSV.");
       const inserts = rows.map(r => ({
+        id: Math.random().toString(36).slice(2),
         user_id: user.id,
         amount: Math.abs(r.amount),
         type: r.amount < 0 ? "expense" as const : "income" as const,
@@ -29,8 +29,11 @@ export function CSVImporter() {
         currency: r.currency || preferredCurrency,
         occurred_at: r.date || new Date().toISOString(),
       }));
-      const { error } = await supabase.from("transactions").insert(inserts);
-      if (error) throw error;
+      
+      const existingStr = localStorage.getItem("transactions");
+      const existing = existingStr ? JSON.parse(existingStr) : [];
+      localStorage.setItem("transactions", JSON.stringify([...existing, ...inserts]));
+      
       toast.success(`Imported ${inserts.length} transactions! ✨`);
       qc.invalidateQueries({ queryKey: ["transactions"] });
     } catch (e: any) {
@@ -47,10 +50,11 @@ export function CSVImporter() {
     const cats = ["Food & Dining", "Transport", "Shopping", "Entertainment", "Other"];
     const inserts: any[] = [];
     const now = new Date();
-    inserts.push({ user_id: user.id, amount: 5000000, type: "income", category: "Salary", description: "Monthly salary", currency: preferredCurrency, occurred_at: new Date(now.getFullYear(), now.getMonth(), 1).toISOString() });
+    inserts.push({ id: Math.random().toString(36).slice(2), user_id: user.id, amount: 5000000, type: "income", category: "Salary", description: "Monthly salary", currency: preferredCurrency, occurred_at: new Date(now.getFullYear(), now.getMonth(), 1).toISOString() });
     for (let i = 0; i < 40; i++) {
       const d = new Date(); d.setDate(d.getDate() - Math.floor(Math.random() * 60));
       inserts.push({
+        id: Math.random().toString(36).slice(2),
         user_id: user.id,
         amount: Math.floor(Math.random() * 200000) + 20000,
         type: "expense",
@@ -69,15 +73,11 @@ export function CSVImporter() {
     ];
     const upInserts = upcomings.map(u => {
       const d = new Date(); d.setDate(d.getDate() + u.days);
-      return { user_id: user.id, title: u.title, amount: u.amount, currency: preferredCurrency, due_date: d.toISOString().slice(0, 10), icon: u.icon, type: (u.type as any) || "expense" };
+      return { id: Math.random().toString(36).slice(2), user_id: user.id, title: u.title, amount: u.amount, currency: preferredCurrency, due_date: d.toISOString().slice(0, 10), icon: u.icon, type: (u.type as any) || "expense" };
     });
     try {
-      const [transRes, upcRes] = await Promise.all([
-        supabase.from("transactions").insert(inserts),
-        supabase.from("upcoming_transactions").insert(upInserts),
-      ]);
-      if (transRes.error) throw transRes.error;
-      if (upcRes.error) throw upcRes.error;
+      localStorage.setItem("transactions", JSON.stringify(inserts));
+      localStorage.setItem("upcoming_transactions", JSON.stringify(upInserts));
       
       toast.success("Demo data loaded!");
       await qc.invalidateQueries({ queryKey: ["transactions"] });

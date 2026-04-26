@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Target } from "lucide-react";
 import { CURRENCIES } from "@/lib/currency";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,20 +23,27 @@ export function GoalQuickCreate() {
     e.preventDefault();
     if (!user || !title.trim() || !amount) return;
     setBusy(true);
-    const { error } = await supabase.from("goals").insert({
+    
+    const newGoal = {
+      id: Math.random().toString(36).slice(2),
       user_id: user.id,
       title: title.trim(),
       target_amount: Number(amount),
+      current_amount: 0,
       currency,
       deadline: deadline || null,
-    });
+      status: "active",
+      created_at: new Date().toISOString()
+    };
+    
+    const existingStr = localStorage.getItem("goals");
+    const existing = existingStr ? JSON.parse(existingStr) : [];
+    localStorage.setItem("goals", JSON.stringify([...existing, newGoal]));
+    
     setBusy(false);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Goal created! 🎯");
-      setTitle(""); setAmount(""); setDeadline("");
-      qc.invalidateQueries({ queryKey: ["goals"] });
-    }
+    toast.success("Goal created! 🎯");
+    setTitle(""); setAmount(""); setDeadline("");
+    qc.invalidateQueries({ queryKey: ["goals"] });
   }
 
   return (

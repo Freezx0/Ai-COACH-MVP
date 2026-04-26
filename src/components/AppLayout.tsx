@@ -12,6 +12,7 @@ import {
   Bell,
   Sparkle,
   Crown,
+  Menu,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import mascot from "@/assets/mascot.png";
@@ -24,6 +25,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { CoachChat } from "@/components/CoachChat";
 import { useState } from "react";
 
@@ -41,6 +43,7 @@ export function AppLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useTranslation();
 
   const initials = (user?.user_metadata?.full_name || user?.email || "U")
@@ -51,6 +54,9 @@ export function AppLayout() {
     .toUpperCase();
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Friend";
+
+  const mainMobileNav = navItems.slice(0, 4);
+  const moreMobileNav = navItems.slice(4);
 
   return (
     <div className="min-h-screen flex w-full gradient-soft">
@@ -164,22 +170,82 @@ export function AppLayout() {
         </header>
 
         {/* Mobile bottom nav */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 glass border-t border-border/50 flex items-center overflow-x-auto hide-scrollbar px-1 py-1.5">
-          {navItems.filter(item => item.to !== '/insights').map(({ to, icon: Icon, label, end }) => (
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 glass border-t border-border/50 grid grid-cols-5 px-1 py-1.5 pb-safe">
+          {mainMobileNav.map(({ to, icon: Icon, label, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex flex-col items-center flex-shrink-0 w-[4.5rem] gap-0.5 py-1.5 rounded-lg text-[10px] transition-colors ${
+                `flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-lg text-[10px] transition-colors ${
                   isActive ? "text-primary font-medium" : "text-muted-foreground"
                 }`
               }
             >
-              <Icon className="w-5 h-5" />
-              <span className="truncate w-full text-center px-0.5">{t(label)}</span>
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              <span className="truncate w-full text-center px-0.5 text-[9px]">{t(label)}</span>
             </NavLink>
           ))}
+          
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <button className="flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-lg text-[10px] transition-colors text-muted-foreground">
+                <Menu className="w-5 h-5 flex-shrink-0" />
+                <span className="truncate w-full text-center px-0.5 text-[9px]">{t("More")}</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-3xl border-t-0 p-0 overflow-hidden min-h-[50vh]">
+              <div className="p-6">
+                <SheetHeader className="mb-4">
+                  <SheetTitle className="text-left font-display text-2xl">{t("Menu")}</SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-2">
+                  {moreMobileNav.map(({ to, icon: Icon, label, end }) => (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      end={end}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                          isActive ? 'bg-primary text-primary-foreground font-medium shadow-md' : 'hover:bg-muted font-medium'
+                        }`
+                      }
+                    >
+                      <Icon className="w-5 h-5" />
+                      {t(label)}
+                    </NavLink>
+                  ))}
+                  
+                  {/* Additional mobile-only menu items */}
+                  <div className="h-px bg-border my-2" />
+                  
+                  <button 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate("/settings");
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-muted font-medium text-left"
+                  >
+                    <Settings className="w-5 h-5" />
+                    {t("Settings")}
+                  </button>
+                  
+                  <button 
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await signOut();
+                      navigate("/auth");
+                    }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-destructive/10 text-destructive font-medium text-left"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    {t("Log Out")}
+                  </button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </nav>
 
         <main className="flex-1 px-4 lg:px-8 py-6 pb-24 lg:pb-8">

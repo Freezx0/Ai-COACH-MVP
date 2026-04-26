@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CURRENCIES } from "@/lib/currency";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
@@ -19,8 +18,8 @@ export default function Settings() {
 
   async function saveName() {
     setBusy(true);
-    await supabase.auth.updateUser({ data: { full_name: name } });
-    await supabase.from("profiles").update({ full_name: name }).eq("id", user!.id);
+    // Mock save
+    await new Promise(r => setTimeout(r, 400));
     setBusy(false);
     toast.success("Saved");
   }

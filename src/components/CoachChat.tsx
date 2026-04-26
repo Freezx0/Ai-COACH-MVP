@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, Send, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import mascot from "@/assets/mascot.png";
@@ -32,11 +31,12 @@ export function CoachChat({ open, onOpenChange }: { open: boolean; onOpenChange:
 
   async function buildContext() {
     if (!user) return null;
-    const since = new Date(); since.setDate(since.getDate() - 60);
-    const [{ data: txns }, { data: goals }] = await Promise.all([
-      supabase.from("transactions").select("amount,type,category,occurred_at").eq("user_id", user.id).gte("occurred_at", since.toISOString()).order("occurred_at", { ascending: false }).limit(100),
-      supabase.from("goals").select("title,target_amount,current_amount,deadline,status").eq("user_id", user.id),
-    ]);
+    const existingTxns = localStorage.getItem("transactions");
+    const txns = existingTxns ? JSON.parse(existingTxns) : [];
+    
+    const existingGoals = localStorage.getItem("goals");
+    const goals = existingGoals ? JSON.parse(existingGoals) : [];
+
     let income = 0, expense = 0;
     const byCat: Record<string, number> = {};
     (txns || []).forEach((t: any) => {
@@ -57,45 +57,16 @@ export function CoachChat({ open, onOpenChange }: { open: boolean; onOpenChange:
 
     try {
       const context = await buildContext();
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/ai-coach`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
-        body: JSON.stringify({ messages: next, context }),
-      });
-
-      if (resp.status === 429) { toast.error("Rate limit reached. Try again in a moment."); setLoading(false); return; }
-      if (resp.status === 402) { toast.error("AI credits exhausted. Add funds in workspace settings."); setLoading(false); return; }
-      if (!resp.ok || !resp.body) throw new Error("Stream failed");
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let assistant = "";
-      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
-      let done = false;
-
-      while (!done) {
-        const { done: d, value } = await reader.read();
-        if (d) break;
-        buffer += decoder.decode(value, { stream: true });
-        let idx: number;
-        while ((idx = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, idx);
-          buffer = buffer.slice(idx + 1);
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (!line.startsWith("data: ")) continue;
-          const json = line.slice(6).trim();
-          if (json === "[DONE]") { done = true; break; }
-          try {
-            const parsed = JSON.parse(json);
-            const delta = parsed.choices?.[0]?.delta?.content;
-            if (delta) {
-              assistant += delta;
-              setMessages(prev => prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistant } : m));
-            }
-          } catch { buffer = line + "\n" + buffer; break; }
-        }
+      
+      // Mock streaming
+      await new Promise(r => setTimeout(r, 600));
+      
+      let assistant = "That's a great question! Based on your recent transactions, I'd say you're doing well. Keep tracking your expenses!";
+      if (text.toLowerCase().includes("save") || text.toLowerCase().includes("how to")) {
+         assistant = `Looking at your top expenses (${Object.keys(context?.last60Days.byCategory || {}).join(", ")}), you might want to review your budget! Setting a clear limit on discretionary categories can help you save more.`;
       }
+      
+      setMessages(prev => [...prev, { role: "assistant", content: assistant }]);
     } catch (e) {
       console.error(e);
       toast.error("Couldn't reach the coach. Try again.");

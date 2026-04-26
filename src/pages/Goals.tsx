@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Target, Plus, Trash2, Trophy } from "lucide-react";
 import { formatMoney } from "@/lib/currency";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { GoalQuickCreate } from "@/components/GoalQuickCreate";
@@ -20,7 +19,11 @@ export default function Goals() {
   const [amount, setAmount] = useState("");
 
   async function remove(id: string) {
-    await supabase.from("goals").delete().eq("id", id);
+    const existingStr = localStorage.getItem("goals");
+    let existing = existingStr ? JSON.parse(existingStr) : [];
+    existing = existing.filter((g: any) => g.id !== id);
+    localStorage.setItem("goals", JSON.stringify(existing));
+    
     toast.success("Goal removed");
     qc.invalidateQueries({ queryKey: ["goals"] });
   }
@@ -30,7 +33,17 @@ export default function Goals() {
     if (!contributing) return;
     const newAmt = Number(contributing.current_amount) + Number(amount);
     const status = newAmt >= Number(contributing.target_amount) ? "completed" : "active";
-    await supabase.from("goals").update({ current_amount: newAmt, status }).eq("id", contributing.id);
+    
+    const existingStr = localStorage.getItem("goals");
+    let existing = existingStr ? JSON.parse(existingStr) : [];
+    existing = existing.map((g: any) => {
+      if (g.id === contributing.id) {
+        return { ...g, current_amount: newAmt, status };
+      }
+      return g;
+    });
+    localStorage.setItem("goals", JSON.stringify(existing));
+    
     toast.success(status === "completed" ? "Goal completed! 🏆" : "Added!");
     qc.invalidateQueries({ queryKey: ["goals"] });
     setContributing(null); setAmount("");

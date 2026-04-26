@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useTransactions(limit?: number) {
@@ -8,10 +7,10 @@ export function useTransactions(limit?: number) {
     queryKey: ["transactions", user?.id, limit],
     enabled: !!user,
     queryFn: async () => {
-      let q = supabase.from("transactions").select("*").eq("user_id", user!.id).order("occurred_at", { ascending: false });
-      if (limit) q = q.limit(limit);
-      const { data, error } = await q;
-      if (error) throw error;
+      const dataStr = localStorage.getItem("transactions");
+      let data = dataStr ? JSON.parse(dataStr) : [];
+      data.sort((a: any, b: any) => new Date(b.occurred_at).getTime() - new Date(a.occurred_at).getTime());
+      if (limit) data = data.slice(0, limit);
       return data;
     },
   });
@@ -23,9 +22,8 @@ export function useGoals() {
     queryKey: ["goals", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("goals").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      const dataStr = localStorage.getItem("goals");
+      return dataStr ? JSON.parse(dataStr) : [];
     },
   });
 }
@@ -36,8 +34,9 @@ export function useUpcoming() {
     queryKey: ["upcoming", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase.from("upcoming_transactions").select("*").eq("user_id", user!.id).order("due_date", { ascending: true });
-      if (error) throw error;
+      const dataStr = localStorage.getItem("upcoming_transactions");
+      let data = dataStr ? JSON.parse(dataStr) : [];
+      data.sort((a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
       return data;
     },
   });
