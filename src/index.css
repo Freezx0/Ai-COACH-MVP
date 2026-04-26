@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light surfaces */
+    --background: 150 20% 98%;
+    --foreground: 220 25% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+
+    /* Mint/emerald primary */
+    --primary: 152 68% 42%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 158 75% 55%;
+
+    --secondary: 150 30% 95%;
+    --secondary-foreground: 220 25% 18%;
+
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 152 70% 94%;
+    --accent-foreground: 152 68% 28%;
+
+    --destructive: 358 75% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 30 50% 15%;
+
+    --info: 215 90% 58%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 220 18% 92%;
+    --input: 220 18% 92%;
+    --ring: 152 68% 42%;
+
+    --radius: 1rem;
+
+    /* Category palette */
+    --cat-food: 152 68% 48%;
+    --cat-transport: 215 85% 60%;
+    --cat-shopping: 42 92% 58%;
+    --cat-entertainment: 270 70% 65%;
+    --cat-other: 358 75% 62%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(152 68% 42%), hsl(158 75% 55%));
+    --gradient-soft: linear-gradient(180deg, hsl(150 25% 98%), hsl(150 20% 95%));
+    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(150 25% 98%));
+    --gradient-mascot: linear-gradient(160deg, hsl(152 70% 94%), hsl(215 80% 95%));
+
+    /* Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(220 25% 15% / 0.06);
+    --shadow-card: 0 4px 24px -8px hsl(220 25% 15% / 0.08);
+    --shadow-glow: 0 12px 40px -12px hsl(152 68% 42% / 0.35);
+    --shadow-elevated: 0 16px 48px -16px hsl(220 25% 15% / 0.18);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 25% 18%;
+    --sidebar-primary: 152 68% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 152 70% 94%;
+    --sidebar-accent-foreground: 152 68% 28%;
+    --sidebar-border: 220 18% 92%;
+    --sidebar-ring: 152 68% 42%;
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 222 30% 8%;
+    --foreground: 150 20% 96%;
+
+    --card: 222 28% 11%;
+    --card-foreground: 150 20% 96%;
+
+    --popover: 222 28% 11%;
+    --popover-foreground: 150 20% 96%;
+
+    --primary: 152 70% 50%;
+    --primary-foreground: 222 30% 8%;
+    --primary-glow: 158 80% 60%;
+
+    --secondary: 222 22% 16%;
+    --secondary-foreground: 150 20% 96%;
+
+    --muted: 222 22% 14%;
+    --muted-foreground: 220 12% 65%;
+
+    --accent: 152 50% 18%;
+    --accent-foreground: 152 70% 80%;
+
+    --destructive: 358 75% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 60%;
+    --warning-foreground: 30 50% 12%;
+
+    --info: 215 90% 65%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 222 22% 18%;
+    --input: 222 22% 18%;
+    --ring: 152 70% 50%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(152 70% 45%), hsl(158 80% 55%));
+    --gradient-soft: linear-gradient(180deg, hsl(222 30% 9%), hsl(222 28% 11%));
+    --gradient-card: linear-gradient(135deg, hsl(222 28% 12%), hsl(222 26% 14%));
+    --gradient-mascot: linear-gradient(160deg, hsl(152 50% 18%), hsl(215 50% 18%));
+
+    --shadow-card: 0 4px 24px -8px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 12px 40px -12px hsl(152 70% 50% / 0.5);
+    --shadow-elevated: 0 16px 48px -16px hsl(0 0% 0% / 0.6);
+
+    --sidebar-background: 222 30% 9%;
+    --sidebar-foreground: 150 20% 90%;
+    --sidebar-primary: 152 70% 50%;
+    --sidebar-primary-foreground: 222 30% 8%;
+    --sidebar-accent: 152 50% 18%;
+    --sidebar-accent-foreground: 152 70% 80%;
+    --sidebar-border: 222 22% 16%;
+    --sidebar-ring: 152 70% 50%;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+  }
+  html { scroll-behavior: smooth; }
+}
+
+@layer utilities {
+  .gradient-primary { background: var(--gradient-primary); }
+  .gradient-soft { background: var(--gradient-soft); }
+  .gradient-card { background: var(--gradient-card); }
+  .gradient-mascot { background: var(--gradient-mascot); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glass {
+    background: hsl(var(--card) / 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
